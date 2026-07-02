@@ -1,0 +1,128 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "Andhini",
+      "password": "Koordinator",
+      "divisi": "Pengurus Inti",
+      "jabatan": "Koordinator"
+    },
+    {
+      "id": "2",
+      "username": "Irfan",
+      "password": "Wakilkoordinator",
+      "divisi": "Pengurus Inti",
+      "jabatan": "Wakil Koordinator"
+    },
+    {
+      "id": "3",
+      "username": "Diera",
+      "password": "Sekben",
+      "divisi": "Pengurus Inti",
+      "jabatan": "Sekretaris Bendahara"
+    },
+    {
+      "id": "4",
+      "username": "Dalia",
+      "password": "Koormedia",
+      "divisi": "Media",
+      "jabatan": "Koordinator"
+    },
+    {
+      "id": "5",
+      "username": "Dhita",
+      "password": "Media",
+      "divisi": "Media",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "6",
+      "username": "Ara",
+      "password": "Media",
+      "divisi": "Media",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "7",
+      "username": "Amel",
+      "password": "Koorpaper",
+      "divisi": "Paper",
+      "jabatan": "Koordinator"
+    },
+    {
+      "id": "8",
+      "username": "Alex",
+      "password": "Paper",
+      "divisi": "Paper",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "9",
+      "username": "Lingga",
+      "password": "Paper",
+      "divisi": "Paper",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "10",
+      "username": "Ririn",
+      "password": "KoorRnD",
+      "divisi": "RnD",
+      "jabatan": "Koordinator"
+    },
+    {
+      "id": "11",
+      "username": "Eben",
+      "password": "RnD",
+      "divisi": "RnD",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "12",
+      "username": "Wibby",
+      "password": "RnD",
+      "divisi": "RnD",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "13",
+      "username": "Bobby",
+      "password": "RnD",
+      "divisi": "RnD",
+      "jabatan": "Anggota"
+    },
+    {
+      "id": "14",
+      "username": "Pembina",
+      "password": "Pembina",
+      "divisi": "Pengurus Inti",
+      "jabatan": "Pembina"
+    }
+  ],
+  "todos": [],
+  "projects": [
+    {
+      "id": "1",
+      "divisi": "Media",
+      "nama": "",
+      "status": "selesai",
+      "foto": ""
+    },
+    {
+      "id": "2",
+      "divisi": "Paper",
+      "nama": "",
+      "status": "selesai",
+      "foto": ""
+    },
+    {
+      "id": "4",
+      "divisi": "Pengurus Inti",
+      "nama": "",
+      "status": "selesai",
+      "foto": ""
+    }
+  ],
+  "sections": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}

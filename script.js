@@ -1,74 +1,51 @@
-// Mobile Navigation Toggle
-const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
+const form = document.getElementById("loginForm");
 
-hamburger.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-});
+form.addEventListener("submit", loginUser);
 
-// Close mobile menu when clicking on a link
-const navLinks = document.querySelectorAll('#nav-menu a');
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
-    });
-});
+async function loginUser(e){
 
-// Header scroll effect
-window.addEventListener('scroll', () => {
-    const header = document.querySelector('header');
-    header.classList.toggle('scrolled', window.scrollY > 50);
-});
+    e.preventDefault();
 
-// Smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = document.querySelector(anchor.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+    const username = document.getElementById("username").value.trim();
+
+    const password = document.getElementById("password").value.trim();
+
+    try{
+
+        const response = await fetch("http://localhost:3001/users");
+
+        const users = await response.json();
+
+        const user = users.find(
+            u =>
+                u.username.toLowerCase() === username.toLowerCase() &&
+                u.password === password
+        );
+
+        if(user){
+
+            localStorage.setItem("user", JSON.stringify(user));
+
+            alert("Login Berhasil");
+
+            window.location.href = "index.html";
+
+        }else{
+
+            document.getElementById("error").innerHTML =
+            "Username atau Password Salah";
+
         }
-    });
-});
 
-// Animation on scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+    }
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
+    catch(error){
 
-// Observe all module boxes
-document.querySelectorAll('.modul-box').forEach(box => {
-    observer.observe(box);
-});
+        console.log(error);
 
-// Add loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '1';
-});
+        document.getElementById("error").innerHTML =
+        "Tidak dapat terhubung ke database";
 
-// Contact button functionality
-document.querySelector('.contact-btn').addEventListener('click', () => {
-    window.location.href = "https://linktr.ee/SiskomLaboratory?utm_source=linktree_profile_share&ltsid=126a6b39-d647-497c-8760-db84b76c0c62";
-});
+    }
 
-// Carousel auto scroll
-const slides = document.querySelector(".slides");
-let idx = 0;
-
-setInterval(() => {
-    idx = (idx + 1) % 4; // Loop index through 0 to 3
-    slides.style.transform = `translateX(${-idx * 100}%)`;
-}, 3000);
+}

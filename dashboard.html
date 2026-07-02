@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Sistem Komunikasi</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f3f5f7;
+    min-height: 100vh;
+    padding: 30px 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h2 { color: #88A947; }
+.header p { color: #666; margin-top: 5px; }
+
+.logout-btn {
+    padding: 10px 20px;
+    border: none;
+    background: #88A947;
+    color: white;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.logout-btn:hover { background: #6d8c34; }
+
+.card {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    margin-bottom: 25px;
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #88A947;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.card h3 {
+    color: #333;
+    cursor: default;
+}
+
+.card h3.editable {
+    cursor: pointer;
+}
+.card h3.editable:hover {
+    text-decoration: underline dotted;
+}
+
+.add-todo {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.add-todo input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.btn-green {
+    padding: 10px 18px;
+    border: none;
+    background: #88A947;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+.btn-green:hover { background: #6d8c34; }
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.item span.divisi-tag {
+    font-size: 12px;
+    background: #e8f0dc;
+    color: #6d8c34;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-right: 10px;
+}
+
+.status {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.status.belum { background: #fde2e2; color: #c0392b; }
+.status.proses { background: #fff3cd; color: #b58900; }
+.status.selesai { background: #d4edda; color: #2e7d32; }
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+}
+.edit-btn {
+    background: #f0ad4e;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.project-item {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+}
+.project-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.project-item img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+    display: block;
+}
+
+.empty {
+    color: #999;
+    text-align: center;
+    padding: 15px;
+    font-style: italic;
+}
+
+.add-section-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: 2px dashed #88A947;
+    background: transparent;
+    color: #6d8c34;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+.add-section-btn:hover {
+    background: #eaf3e0;
+}
+.add-todo input[type="date"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.deadline-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+.deadline-tag.normal { background: #e8f0dc; color: #6d8c34; }
+.deadline-tag.today { background: #fff3cd; color: #b58900; font-weight: bold; }
+.deadline-tag.overdue { background: #fde2e2; color: #c0392b; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div>
+            <h2 id="welcomeText">Selamat datang</h2>
+            <p id="jabatanText"></p>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title-row">
+            <h3>To-Do List</h3>
+        </div>
+        <div class="add-todo">
+    <input type="text" id="newTodoInput" placeholder="Tambah tugas baru...">
+    <input type="date" id="newTodoDeadline">
+    <button class="btn-green" onclick="addTodo()">Tambah</button>
+</div>
+        <div id="todoList"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title-row">
+            <h3>Project Selesai</h3>
+        </div>
+        <button class="btn-green" style="margin-bottom:15px;" onclick="addProject()">+ Tambah Project Baru</button>
+        <div id="projectList"></div>
+    </div>
+
+    <!-- Daftar/list buatan user muncul di sini -->
+    <div id="customSections"></div>
+
+    <button class="add-section-btn" onclick="addSection()">+ Tambah Daftar Baru</button>
+
+</div>
+
+<script>
+// ====== PERBAIKAN: port disamakan dengan json-server (3000), endpoint disamakan dengan db.json ======
+const API_URL = "http://localhost:3000";
+const TODO_ENDPOINT = `${API_URL}/todos`; // sebelumnya: /to%20do%20list (salah, tidak ada di db.json)
+
+// 1. Cek login
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user) {
+    alert("Silakan login terlebih dahulu");
+    window.location.href = "login.html";
+}
+
+// 2. Tampilkan info user
+document.getElementById("welcomeText").innerText = `Halo, ${user.username} 👋`;
+document.getElementById("jabatanText").innerText = `${user.jabatan} - Divisi ${user.divisi}`;
+
+const isPengurusInti = user.divisi === "Pengurus Inti";
+
+/* ============ TO-DO LIST ============ */
+
+function getDeadlineInfo(deadline) {
+    if (!deadline) return "";
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const due = new Date(deadline);
+    due.setHours(0,0,0,0);
+
+    const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
+
+    let cls = "normal";
+    let label = due.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+
+    if (diffDays < 0) {
+        cls = "overdue";
+        label = `Lewat deadline (${label})`;
+    } else if (diffDays === 0) {
+        cls = "today";
+        label = `Deadline hari ini!`;
+    }
+
+    return `<span class="deadline-tag ${cls}" onclick="editDeadline(event, '${deadline}')">${label}</span>`;
+}
+
+async function loadTodos() {
+    try {
+        const res = await fetch(TODO_ENDPOINT);
+        const todos = await res.json();
+
+        const filtered = isPengurusInti
+            ? todos
+            : todos.filter(t => t.divisi === user.divisi);
+
+        const container = document.getElementById("todoList");
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p class="empty">Tidak ada tugas</p>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(t => `
+            <div class="item">
+                <div>
+                    ${isPengurusInti ? `<span class="divisi-tag">${t.divisi}</span>` : ""}
+                    ${t.task}
+                    <span onclick="editDeadlinePrompt('${t.id}', '${t.deadline || ''}')" style="cursor:pointer;">
+                        ${t.deadline ? getDeadlineInfo(t.deadline) : '<span class="deadline-tag normal">+ Set tanggal</span>'}
+                    </span>
+                </div>
+                <div>
+                    <span class="status ${t.status}" onclick="cycleStatus('${t.id}', '${t.status}')">${t.status}</span>
+                    <button class="delete-btn" onclick="deleteTodo('${t.id}')">Hapus</button>
+                </div>
+            </div>
+        `).join("");
+
+        checkReminders(filtered);
+
+    } catch (err) {
+        document.getElementById("todoList").innerHTML =
+            '<p class="empty">Gagal memuat data. Pastikan server (json-server) aktif.</p>';
+        console.error("loadTodos error:", err);
+    }
+}
+
+async function addTodo() {
+    const input = document.getElementById("newTodoInput");
+    const dateInput = document.getElementById("newTodoDeadline");
+    const task = input.value.trim();
+    if (!task) return;
+
+    await fetch(TODO_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            divisi: user.divisi,
+            task: task,
+            status: "belum",
+            deadline: dateInput.value || ""
+        })
+    });
+
+    input.value = "";
+    dateInput.value = "";
+    loadTodos();
+}
+
+async function editDeadlinePrompt(id, currentDeadline) {
+    const newDate = prompt("Set deadline (format: YYYY-MM-DD), kosongkan untuk hapus:", currentDeadline);
+    if (newDate === null) return;
+
+    await fetch(`${TODO_ENDPOINT}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deadline: newDate.trim() })
+    });
+
+    loadTodos();
+}
+
+async function cycleStatus(id, currentStatus) {
+    const next = currentStatus === "belum" ? "proses" : currentStatus === "proses" ? "selesai" : "belum";
+    await fetch(`${TODO_ENDPOINT}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: next })
+    });
+    loadTodos();
+}
+
+async function deleteTodo(id) {
+    if (!confirm("Hapus tugas ini?")) return;
+    await fetch(`${TODO_ENDPOINT}/${id}`, { method: "DELETE" });
+    loadTodos();
+}
+
+/* ============ NOTIFIKASI PENGINGAT ============ */
+
+// Minta izin notifikasi browser sekali saat halaman dibuka
+if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+}
+
+function checkReminders(todos) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const dueSoon = todos.filter(t => {
+        if (!t.deadline || t.status === "selesai") return false;
+        const due = new Date(t.deadline);
+        due.setHours(0,0,0,0);
+        const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
+        return diffDays <= 0; // hari ini atau sudah lewat
+    });
+
+    if (dueSoon.length === 0) return;
+
+    // Notifikasi browser (kalau diizinkan)
+    if ("Notification" in window && Notification.permission === "granted") {
+        dueSoon.forEach(t => {
+            new Notification("Pengingat Tugas", {
+                body: `${t.task} — deadline hari ini atau sudah lewat!`,
+                icon: "Asset/Logo/Logo Siskom.png"
+            });
+        });
+    }
+}
+
+/* ============ PROJECT ============ */
+
+async function loadProjects() {
+    try {
+        const res = await fetch(`${API_URL}/projects`);
+        const projects = await res.json();
+
+        const filtered = isPengurusInti
+            ? projects.filter(p => p.status === "selesai")
+            : projects.filter(p => p.divisi === user.divisi && p.status === "selesai");
+
+        const container = document.getElementById("projectList");
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p class="empty">Belum ada project selesai</p>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(p => `
+            <div class="project-item">
+                <div class="project-item-header">
+                    <div>
+                        ${isPengurusInti ? `<span class="divisi-tag">${p.divisi}</span>` : ""}
+                        <b>${p.nama ? p.nama : '<i style="color:#aaa;">(Nama project belum diisi)</i>'}</b>
+                    </div>
+                    <div>
+                        <button class="edit-btn" onclick="editProjectName('${p.id}', '${(p.nama || '').replace(/'/g, "\\'")}')">Edit Nama</button>
+                        <button class="delete-btn" onclick="deleteProject('${p.id}')">Hapus</button>
+                    </div>
+                </div>
+                ${p.foto ? `<img src="${p.foto}" onclick="window.open('${p.foto}')">` : ""}
+                <input type="file" accept="image/*" onchange="uploadProjectPhoto('${p.id}', this)" style="margin-top:10px;">
+            </div>
+        `).join("");
+
+    } catch (err) {
+        document.getElementById("projectList").innerHTML =
+            '<p class="empty">Gagal memuat data. Pastikan server (json-server) aktif.</p>';
+        console.error("loadProjects error:", err);
+    }
+}
+
+async function addProject() {
+    await fetch(`${API_URL}/projects`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ divisi: user.divisi, nama: "", status: "selesai", foto: "" })
+    });
+    loadProjects();
+}
+
+async function uploadProjectPhoto(id, inputEl) {
+    if (!inputEl.files[0]) return;
+    const fotoBase64 = await fileToBase64(inputEl.files[0]);
+    await fetch(`${API_URL}/projects/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ foto: fotoBase64 })
+    });
+    loadProjects();
+}
+
+async function editProjectName(id, currentName) {
+    const newName = prompt("Edit nama project:", currentName);
+    if (newName === null || newName.trim() === "") return;
+    await fetch(`${API_URL}/projects/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nama: newName.trim() })
+    });
+    loadProjects();
+}
+
+async function deleteProject(id) {
+    if (!confirm("Hapus project ini?")) return;
+    await fetch(`${API_URL}/projects/${id}`, { method: "DELETE" });
+    loadProjects();
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+    });
+}
+
+/* ============ CUSTOM SECTIONS (daftar bebas buatan user) ============ */
+
+async function loadSections() {
+    try {
+        const res = await fetch(`${API_URL}/sections`);
+        const sections = await res.json();
+
+        const filtered = isPengurusInti
+            ? sections
+            : sections.filter(s => s.divisi === user.divisi);
+
+        const container = document.getElementById("customSections");
+
+        if (filtered.length === 0) {
+            container.innerHTML = "";
+            return;
+        }
+
+        container.innerHTML = filtered.map(s => `
+            <div class="card">
+                <div class="card-title-row">
+                    <h3 class="editable" onclick="editSectionTitle('${s.id}', '${(s.title || '').replace(/'/g, "\\'")}')">
+                        ${s.title ? s.title : "(Klik untuk beri nama daftar ini)"}
+                        ${isPengurusInti ? `<span class="divisi-tag" style="margin-left:8px;">${s.divisi}</span>` : ""}
+                    </h3>
+                    <button class="delete-btn" onclick="deleteSection('${s.id}')">Hapus Daftar</button>
+                </div>
+                <div class="add-todo">
+                    <input type="text" id="newItemInput-${s.id}" placeholder="Tambah item...">
+                    <button class="btn-green" onclick="addSectionItem('${s.id}')">Tambah</button>
+                </div>
+                <div>
+                    ${(s.items && s.items.length > 0) ? s.items.map(it => `
+                        <div class="item">
+                            <div>${it.text}</div>
+                            <div>
+                                <span class="status ${it.status}" onclick="cycleSectionItemStatus('${s.id}', '${it.id}', '${it.status}')">${it.status}</span>
+                                <button class="delete-btn" onclick="deleteSectionItem('${s.id}', '${it.id}')">Hapus</button>
+                            </div>
+                        </div>
+                    `).join("") : '<p class="empty">Belum ada item</p>'}
+                </div>
+            </div>
+        `).join("");
+
+    } catch (err) {
+        console.error("loadSections error:", err);
+    }
+}
+
+async function addSection() {
+    await fetch(`${API_URL}/sections`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ divisi: user.divisi, title: "", items: [] })
+    });
+    loadSections();
+}
+
+async function editSectionTitle(id, currentTitle) {
+    const newTitle = prompt("Nama daftar ini:", currentTitle);
+    if (newTitle === null || newTitle.trim() === "") return;
+    await fetch(`${API_URL}/sections/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTitle.trim() })
+    });
+    loadSections();
+}
+
+async function deleteSection(id) {
+    if (!confirm("Hapus daftar ini beserta seluruh isinya?")) return;
+    await fetch(`${API_URL}/sections/${id}`, { method: "DELETE" });
+    loadSections();
+}
+
+async function addSectionItem(sectionId) {
+    const input = document.getElementById(`newItemInput-${sectionId}`);
+    const text = input.value.trim();
+    if (!text) return;
+
+    const res = await fetch(`${API_URL}/sections/${sectionId}`);
+    const section = await res.json();
+
+    const newItem = { id: Date.now().toString(), text: text, status: "belum" };
+    const updatedItems = [...(section.items || []), newItem];
+
+    await fetch(`${API_URL}/sections/${sectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems })
+    });
+
+    loadSections();
+}
+
+async function cycleSectionItemStatus(sectionId, itemId, currentStatus) {
+    const next = currentStatus === "belum" ? "proses" : currentStatus === "proses" ? "selesai" : "belum";
+
+    const res = await fetch(`${API_URL}/sections/${sectionId}`);
+    const section = await res.json();
+
+    const updatedItems = section.items.map(it => it.id === itemId ? { ...it, status: next } : it);
+
+    await fetch(`${API_URL}/sections/${sectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems })
+    });
+
+    loadSections();
+}
+
+async function deleteSectionItem(sectionId, itemId) {
+    if (!confirm("Hapus item ini?")) return;
+
+    const res = await fetch(`${API_URL}/sections/${sectionId}`);
+    const section = await res.json();
+
+    const updatedItems = section.items.filter(it => it.id !== itemId);
+
+    await fetch(`${API_URL}/sections/${sectionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: updatedItems })
+    });
+
+    loadSections();
+}
+
+/* ============ INIT ============ */
+
+loadTodos();
+loadProjects();
+loadSections();
+
+function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
