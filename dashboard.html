@@ -329,6 +329,15 @@ async function loadTodos() {
             ? todos
             : todos.filter(t => t.divisi === user.divisi);
 
+        // ====== Urutkan berdasarkan deadline terdekat ======
+        // Todo tanpa deadline ditaruh paling bawah
+        filtered.sort((a, b) => {
+            if (!a.deadline && !b.deadline) return 0;
+            if (!a.deadline) return 1;
+            if (!b.deadline) return -1;
+            return new Date(a.deadline) - new Date(b.deadline);
+        });
+
         const container = document.getElementById("todoList");
 
         if (filtered.length === 0) {
@@ -402,7 +411,6 @@ async function deleteTodo(id) {
 
 /* ============ NOTIFIKASI PENGINGAT ============ */
 
-// Minta izin notifikasi browser sekali saat halaman dibuka
 if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
 }
@@ -416,12 +424,11 @@ function checkReminders(todos) {
         const due = new Date(t.deadline);
         due.setHours(0,0,0,0);
         const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
-        return diffDays <= 0; // hari ini atau sudah lewat
+        return diffDays <= 0;
     });
 
     if (dueSoon.length === 0) return;
 
-    // Notifikasi browser (kalau diizinkan)
     if ("Notification" in window && Notification.permission === "granted") {
         dueSoon.forEach(t => {
             new Notification("Pengingat Tugas", {
@@ -632,8 +639,6 @@ function logout() {
     window.location.href = "login.html";
 }
 
-// ====== Daftarkan fungsi ke window supaya bisa dipanggil dari onclick="" di HTML ======
-// (wajib karena <script type="module"> tidak otomatis membocorkan fungsi ke scope global)
 window.logout = logout;
 window.addTodo = addTodo;
 window.editDeadlinePrompt = editDeadlinePrompt;
