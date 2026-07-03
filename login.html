@@ -50,6 +50,27 @@ input:focus{
     border-color:#88A947;
 }
 
+.password-wrapper{
+    position:relative;
+    margin-bottom:15px;
+}
+
+.password-wrapper input{
+    margin-bottom:0;
+    padding-right:45px;
+}
+
+.toggle-password{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:19px;
+    user-select:none;
+    color:#666;
+}
+
 button{
     width:100%;
     padding:13px;
@@ -91,24 +112,11 @@ button:hover{
             required
         >
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Masukkan Password"
-            required
-        >
-
-        <button type="submit">
-            Login
-        </button>
-
-    </form>
-
-    <p id="error"></p>
-
-</div>
-
-<script type="module" src="login.js"></script>
-
-</body>
-</html>
+        <div class="password-wrapper">
+            <input
+                type="password"
+                id="password"
+                placeholder="Masukkan Password"
+                required
+            >
+            <span class="toggle-password"
