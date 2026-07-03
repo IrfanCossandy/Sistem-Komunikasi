@@ -79,15 +79,20 @@ body {
 
 .add-todo {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 15px;
 }
 .add-todo input {
-    flex: 1;
+    flex: 1 1 160px;
+    min-width: 0;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 14px;
+}
+.add-todo button {
+    flex: 1 1 auto;
 }
 
 .btn-green {
@@ -258,10 +263,22 @@ body {
 
 </div>
 
-<script>
-// ====== PERBAIKAN: port disamakan dengan json-server (3000), endpoint disamakan dengan db.json ======
-const API_URL = "http://localhost:3000";
-const TODO_ENDPOINT = `${API_URL}/todos`; // sebelumnya: /to%20do%20list (salah, tidak ada di db.json)
+<script type="module">
+// ====== Firestore (menggantikan json-server) ======
+import { db } from "./firebase.js";
+import {
+    collection,
+    getDocs,
+    addDoc,
+    doc,
+    updateDoc,
+    deleteDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const todosCol = collection(db, "todos");
+const projectsCol = collection(db, "projects");
+const sectionsCol = collection(db, "sections");
 
 // 1. Cek login
 const user = JSON.parse(localStorage.getItem("user"));
@@ -300,13 +317,13 @@ function getDeadlineInfo(deadline) {
         label = `Deadline hari ini!`;
     }
 
-    return `<span class="deadline-tag ${cls}" onclick="editDeadline(event, '${deadline}')">${label}</span>`;
+    return `<span class="deadline-tag ${cls}">${label}</span>`;
 }
 
 async function loadTodos() {
     try {
-        const res = await fetch(TODO_ENDPOINT);
-        const todos = await res.json();
+        const snapshot = await getDocs(todosCol);
+        const todos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
         const filtered = isPengurusInti
             ? todos
@@ -339,7 +356,7 @@ async function loadTodos() {
 
     } catch (err) {
         document.getElementById("todoList").innerHTML =
-            '<p class="empty">Gagal memuat data. Pastikan server (json-server) aktif.</p>';
+            '<p class="empty">Gagal memuat data.</p>';
         console.error("loadTodos error:", err);
     }
 }
@@ -350,15 +367,11 @@ async function addTodo() {
     const task = input.value.trim();
     if (!task) return;
 
-    await fetch(TODO_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            divisi: user.divisi,
-            task: task,
-            status: "belum",
-            deadline: dateInput.value || ""
-        })
+    await addDoc(todosCol, {
+        divisi: user.divisi,
+        task: task,
+        status: "belum",
+        deadline: dateInput.value || ""
     });
 
     input.value = "";
@@ -370,28 +383,20 @@ async function editDeadlinePrompt(id, currentDeadline) {
     const newDate = prompt("Set deadline (format: YYYY-MM-DD), kosongkan untuk hapus:", currentDeadline);
     if (newDate === null) return;
 
-    await fetch(`${TODO_ENDPOINT}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deadline: newDate.trim() })
-    });
+    await updateDoc(doc(db, "todos", id), { deadline: newDate.trim() });
 
     loadTodos();
 }
 
 async function cycleStatus(id, currentStatus) {
     const next = currentStatus === "belum" ? "proses" : currentStatus === "proses" ? "selesai" : "belum";
-    await fetch(`${TODO_ENDPOINT}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: next })
-    });
+    await updateDoc(doc(db, "todos", id), { status: next });
     loadTodos();
 }
 
 async function deleteTodo(id) {
     if (!confirm("Hapus tugas ini?")) return;
-    await fetch(`${TODO_ENDPOINT}/${id}`, { method: "DELETE" });
+    await deleteDoc(doc(db, "todos", id));
     loadTodos();
 }
 
@@ -431,8 +436,8 @@ function checkReminders(todos) {
 
 async function loadProjects() {
     try {
-        const res = await fetch(`${API_URL}/projects`);
-        const projects = await res.json();
+        const snapshot = await getDocs(projectsCol);
+        const projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
         const filtered = isPengurusInti
             ? projects.filter(p => p.status === "selesai")
@@ -464,45 +469,33 @@ async function loadProjects() {
 
     } catch (err) {
         document.getElementById("projectList").innerHTML =
-            '<p class="empty">Gagal memuat data. Pastikan server (json-server) aktif.</p>';
+            '<p class="empty">Gagal memuat data.</p>';
         console.error("loadProjects error:", err);
     }
 }
 
 async function addProject() {
-    await fetch(`${API_URL}/projects`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ divisi: user.divisi, nama: "", status: "selesai", foto: "" })
-    });
+    await addDoc(projectsCol, { divisi: user.divisi, nama: "", status: "selesai", foto: "" });
     loadProjects();
 }
 
 async function uploadProjectPhoto(id, inputEl) {
     if (!inputEl.files[0]) return;
     const fotoBase64 = await fileToBase64(inputEl.files[0]);
-    await fetch(`${API_URL}/projects/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ foto: fotoBase64 })
-    });
+    await updateDoc(doc(db, "projects", id), { foto: fotoBase64 });
     loadProjects();
 }
 
 async function editProjectName(id, currentName) {
     const newName = prompt("Edit nama project:", currentName);
     if (newName === null || newName.trim() === "") return;
-    await fetch(`${API_URL}/projects/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nama: newName.trim() })
-    });
+    await updateDoc(doc(db, "projects", id), { nama: newName.trim() });
     loadProjects();
 }
 
 async function deleteProject(id) {
     if (!confirm("Hapus project ini?")) return;
-    await fetch(`${API_URL}/projects/${id}`, { method: "DELETE" });
+    await deleteDoc(doc(db, "projects", id));
     loadProjects();
 }
 
@@ -519,8 +512,8 @@ function fileToBase64(file) {
 
 async function loadSections() {
     try {
-        const res = await fetch(`${API_URL}/sections`);
-        const sections = await res.json();
+        const snapshot = await getDocs(sectionsCol);
+        const sections = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
         const filtered = isPengurusInti
             ? sections
@@ -566,28 +559,20 @@ async function loadSections() {
 }
 
 async function addSection() {
-    await fetch(`${API_URL}/sections`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ divisi: user.divisi, title: "", items: [] })
-    });
+    await addDoc(sectionsCol, { divisi: user.divisi, title: "", items: [] });
     loadSections();
 }
 
 async function editSectionTitle(id, currentTitle) {
     const newTitle = prompt("Nama daftar ini:", currentTitle);
     if (newTitle === null || newTitle.trim() === "") return;
-    await fetch(`${API_URL}/sections/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle.trim() })
-    });
+    await updateDoc(doc(db, "sections", id), { title: newTitle.trim() });
     loadSections();
 }
 
 async function deleteSection(id) {
     if (!confirm("Hapus daftar ini beserta seluruh isinya?")) return;
-    await fetch(`${API_URL}/sections/${id}`, { method: "DELETE" });
+    await deleteDoc(doc(db, "sections", id));
     loadSections();
 }
 
@@ -596,17 +581,14 @@ async function addSectionItem(sectionId) {
     const text = input.value.trim();
     if (!text) return;
 
-    const res = await fetch(`${API_URL}/sections/${sectionId}`);
-    const section = await res.json();
+    const sectionRef = doc(db, "sections", sectionId);
+    const sectionSnap = await getDoc(sectionRef);
+    const section = sectionSnap.data();
 
     const newItem = { id: Date.now().toString(), text: text, status: "belum" };
     const updatedItems = [...(section.items || []), newItem];
 
-    await fetch(`${API_URL}/sections/${sectionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: updatedItems })
-    });
+    await updateDoc(sectionRef, { items: updatedItems });
 
     loadSections();
 }
@@ -614,16 +596,13 @@ async function addSectionItem(sectionId) {
 async function cycleSectionItemStatus(sectionId, itemId, currentStatus) {
     const next = currentStatus === "belum" ? "proses" : currentStatus === "proses" ? "selesai" : "belum";
 
-    const res = await fetch(`${API_URL}/sections/${sectionId}`);
-    const section = await res.json();
+    const sectionRef = doc(db, "sections", sectionId);
+    const sectionSnap = await getDoc(sectionRef);
+    const section = sectionSnap.data();
 
     const updatedItems = section.items.map(it => it.id === itemId ? { ...it, status: next } : it);
 
-    await fetch(`${API_URL}/sections/${sectionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: updatedItems })
-    });
+    await updateDoc(sectionRef, { items: updatedItems });
 
     loadSections();
 }
@@ -631,16 +610,13 @@ async function cycleSectionItemStatus(sectionId, itemId, currentStatus) {
 async function deleteSectionItem(sectionId, itemId) {
     if (!confirm("Hapus item ini?")) return;
 
-    const res = await fetch(`${API_URL}/sections/${sectionId}`);
-    const section = await res.json();
+    const sectionRef = doc(db, "sections", sectionId);
+    const sectionSnap = await getDoc(sectionRef);
+    const section = sectionSnap.data();
 
     const updatedItems = section.items.filter(it => it.id !== itemId);
 
-    await fetch(`${API_URL}/sections/${sectionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: updatedItems })
-    });
+    await updateDoc(sectionRef, { items: updatedItems });
 
     loadSections();
 }
@@ -655,6 +631,24 @@ function logout() {
     localStorage.removeItem("user");
     window.location.href = "login.html";
 }
+
+// ====== Daftarkan fungsi ke window supaya bisa dipanggil dari onclick="" di HTML ======
+// (wajib karena <script type="module"> tidak otomatis membocorkan fungsi ke scope global)
+window.logout = logout;
+window.addTodo = addTodo;
+window.editDeadlinePrompt = editDeadlinePrompt;
+window.cycleStatus = cycleStatus;
+window.deleteTodo = deleteTodo;
+window.addProject = addProject;
+window.editProjectName = editProjectName;
+window.deleteProject = deleteProject;
+window.uploadProjectPhoto = uploadProjectPhoto;
+window.addSection = addSection;
+window.editSectionTitle = editSectionTitle;
+window.deleteSection = deleteSection;
+window.addSectionItem = addSectionItem;
+window.cycleSectionItemStatus = cycleSectionItemStatus;
+window.deleteSectionItem = deleteSectionItem;
 </script>
 
 </body>
