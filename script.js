@@ -1,51 +1,73 @@
-const form = document.getElementById("loginForm");
+// =========================
+// HAMBURGER MENU
+// =========================
 
-form.addEventListener("submit", loginUser);
+const hamburger = document.getElementById("hamburger");
+const navMenu = document.getElementById("nav-menu");
 
-async function loginUser(e){
+if (hamburger && navMenu) {
 
-    e.preventDefault();
+    hamburger.addEventListener("click", () => {
 
-    const username = document.getElementById("username").value.trim();
+        navMenu.classList.toggle("active");
 
-    const password = document.getElementById("password").value.trim();
+    });
 
-    try{
+    // Tutup menu saat salah satu menu dipilih
+    document.querySelectorAll("#nav-menu a").forEach(link => {
 
-        const response = await fetch("http://localhost:3001/users");
+        link.addEventListener("click", () => {
 
-        const users = await response.json();
+            navMenu.classList.remove("active");
 
-        const user = users.find(
-            u =>
-                u.username.toLowerCase() === username.toLowerCase() &&
-                u.password === password
-        );
+        });
 
-        if(user){
+    });
 
-            localStorage.setItem("user", JSON.stringify(user));
+}
 
-            alert("Login Berhasil");
+// =========================
+// HEADER SCROLL EFFECT
+// =========================
 
-            window.location.href = "index.html";
+window.addEventListener("scroll", () => {
 
-        }else{
+    const header = document.querySelector("header");
 
-            document.getElementById("error").innerHTML =
-            "Username atau Password Salah";
+    if(window.scrollY > 30){
+
+        header.classList.add("scrolled");
+
+    }else{
+
+        header.classList.remove("scrolled");
+
+    }
+
+});
+
+// =========================
+// SMOOTH SCROLL
+// =========================
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
+
+    anchor.addEventListener("click",function(e){
+
+        e.preventDefault();
+
+        const tujuan=document.querySelector(this.getAttribute("href"));
+
+        if(tujuan){
+
+            tujuan.scrollIntoView({
+
+                behavior:"smooth"
+
+            });
 
         }
 
-    }
+    });
 
-    catch(error){
-
-        console.log(error);
-
-        document.getElementById("error").innerHTML =
-        "Tidak dapat terhubung ke database";
-
-    }
-
-}
+});
