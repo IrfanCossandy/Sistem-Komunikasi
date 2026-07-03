@@ -1,0 +1,11 @@
+{
+  "name": "siskom-api",
+  "version": "1.0.0",
+  "description": "Backend json-server untuk dashboard Siskom Laboratory",
+  "scripts": {
+    "start": "json-server --watch db.json --port $PORT --host 0.0.0.0"
+  },
+  "dependencies": {
+    "json-server": "0.17.4"
+  }
+}
