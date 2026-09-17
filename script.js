@@ -71,3 +71,19 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor=>{
     });
 
 });
+
+// =========================
+// CONTACT BUTTON
+// =========================
+
+const contactBtn = document.querySelector(".contact-btn");
+
+if (contactBtn) {
+
+    contactBtn.addEventListener("click", () => {
+
+        window.location.href = "https://linktr.ee/SiskomLaboratory?utm_source=linktree_profile_share&ltsid=126a6b39-d647-497c-8760-db84b76c0c62";
+
+    });
+
+}
