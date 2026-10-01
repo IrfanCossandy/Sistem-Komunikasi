@@ -321,6 +321,8 @@ main {
 .activity-card img {
     width: 100%;
     height: 350px;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
 }
 
 .activity-card:hover img {
@@ -333,6 +335,10 @@ main {
 
 .card-content h3 {
     font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm);
+    position: relative;
 }
 
 .card-content h3::after {
