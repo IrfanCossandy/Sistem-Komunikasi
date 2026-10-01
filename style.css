@@ -200,10 +200,10 @@ header.scrolled {
 /* ===== HERO SECTION ===== */
 .hero {
     position: relative;
-    isolation: isolate;                 /* penting: carousel tidak lagi tertutup background hero */
-    height: calc(100vh - 80px);         /* 80px = tinggi header, supaya foto tidak terpotong di bawah layar */
-    min-height: 560px;
+    isolation: isolate;
     margin-top: 80px;                   /* offset untuk header */
+    aspect-ratio: 3 / 2;                /* tinggi mengikuti lebar → foto utuh, tidak terpotong */
+    height: auto;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -211,7 +211,7 @@ header.scrolled {
 }
 
 /* Lapisan gelap tipis supaya teks putih terbaca.
-   Bagian atas sengaja paling terang agar tulisan di foto 1 tetap jelas. */
+   Bagian atas paling terang agar tulisan di foto 1 tetap jelas. */
 .hero::before {
     content: "";
     position: absolute;
@@ -247,16 +247,8 @@ header.scrolled {
     flex: 0 0 33.3333%;
     width: 33.3333%;
     height: 100%;
-    object-fit: cover;                  /* foto tim: penuh layar */
-    object-position: center 30%;        /* jaga agar wajah tidak terpotong */
-    background: var(--dark-color);
-}
-
-/* Foto 1 (ada tulisan): tampil utuh, tidak dipotong sama sekali */
-.slides img:nth-child(1) {
-    object-fit: contain;
+    object-fit: cover;                  /* rasio foto = rasio hero (3:2), jadi tidak ada yang terpotong */
     object-position: center;
-    background: #eceeea;                /* senada dengan latar putih-abu foto */
 }
 
 @keyframes slide {
@@ -785,11 +777,12 @@ a:focus, button:focus {
 }
 
 .login-box{
-    @media (max-width: 768px) {
-    .slides img {
-        object-fit: contain;
-        object-position: center;
-    }
+ .login-box{
+    width:350px;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
 }
 
 .login-box h2{
@@ -813,4 +806,42 @@ a:focus, button:focus {
     border-radius:5px;
     cursor:pointer;
 }
-} 
+@media (max-width: 768px) {
+    .hero {
+        aspect-ratio: auto;
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero::before {
+        display: none;
+    }
+
+    .carousel {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        height: auto;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .slides {
+        height: auto;
+    }
+
+    .slides img {
+        height: auto;
+        aspect-ratio: 3 / 2;
+    }
+
+    .hero-text {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+}
+}
+}
