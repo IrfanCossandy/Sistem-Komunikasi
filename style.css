@@ -200,6 +200,7 @@ header.scrolled {
 /* ===== HERO SECTION ===== */
 .hero {
     position: relative;
+    isolation: isolate;                 /* carousel tampil di atas background hero */
     width: 100%;
     margin-top: 80px;                   /* offset untuk header */
     aspect-ratio: 3 / 2;                /* desktop: tinggi mengikuti lebar → foto utuh, tidak terpotong */
@@ -207,7 +208,23 @@ header.scrolled {
     display: flex;
     align-items: center;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(144, 179, 69, 0.8), rgba(250, 252, 248, 0.7));
+    background: var(--dark-color);      /* warna cadangan saat foto masih loading */
+}
+
+/* Lapisan gelap tipis supaya teks putih terbaca.
+   Bagian atas paling terang agar tulisan di foto 1 tetap jelas. */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        rgba(45, 74, 26, 0.05) 0%,
+        rgba(45, 74, 26, 0.50) 40%,
+        rgba(45, 74, 26, 0.65) 100%
+    );
 }
 
 .carousel {
@@ -555,9 +572,6 @@ footer {
         aspect-ratio: auto;
     }
 
-    .hero::before {
-        display: none;
-    }
     
     .logo h1 {
         font-size: 1.2rem;
